@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  node:
+    build:
+      context: ./backend/backend-nest 
+      dockerfile: Dockerfile 
+    container_name: nest-backend-pedreader
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/backend-nest:/usr/src/app
+    networks:
+      - nest-networks
+    depends_on:
+      - mysql
+      - phpmyadmin
+
+  react:
+    build:
+      context: ./frontend/frontend-react  
+      dockerfile: Dockerfile  
+    container_name: nest-frontend-pedreader
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./frontend/frontend-react:/usr/src/app
+    networks:
+      - nest-networks
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql-pedreader
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysqldb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root123"
+      MYSQL_DATABASE: "lib"
+      MYSQL_ROOT_HOST: "%"
+    networks:
+      - nest-networks
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin-pedreader
+    environment:
+      PMA_HOST: mysql
+      PMA_ARBITRARY: "1"
+    ports:
+      - "8080:80"
+    networks:
+      - nest-networks
+
+networks:
+  nest-networks:
+
+volumes:
+  mysqldb:
