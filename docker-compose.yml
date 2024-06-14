@@ -29,7 +29,7 @@ services:
       - nest-networks
 
   mysql:
-    image: mysql:latest
+    image: mysql:5.7
     container_name: mysql-pedreader
     ports:
       - "3307:3306"
@@ -41,6 +41,7 @@ services:
       MYSQL_ROOT_HOST: "%"
     networks:
       - nest-networks
+
 
   phpmyadmin:
     image: phpmyadmin
