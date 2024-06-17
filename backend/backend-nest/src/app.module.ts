@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { BooksModule } from './books/modules/book.module';
 import { BookEntity } from './books/entities/book.entity';
 import { AuthorEntity } from './authors/entities/author.entity';
-import { AuthorsModule } from './authors/author.module';
+import { AuthorsModule } from './authors/modules/author.module';
 import { UsersModule } from './users/modules/user.module';
 import { UserEntity } from './users/entities/user.entity';
 
