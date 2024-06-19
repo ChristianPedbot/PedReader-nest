@@ -1,0 +1,75 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  .placeholder {
+    background-color: #73a8f9;
+  }
+  
+  .cardt-title {
+    min-height: 87px;
+    margin: 0 0 25px;
+    overflow: hidden;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #FFF;
+    position: relative;
+  }
+  
+  .cardt-name {
+    font-size: 1em;
+    color: #FFF;
+    text-decoration: none;
+    position: relative;
+  }
+  
+  .column {
+    float: left;
+    width: 25%;
+    padding: 0 10px;
+  }
+  
+  .row {
+    margin: 0 -5px;
+  }
+  
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  
+  }
+  
+  .cardt {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    text-align: center;
+    background-color: #121212;
+    text-decoration: none;
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  
+  @media screen and (max-width: 600px) {
+    .column {
+      width: 100%;
+      display: block;
+      margin-bottom: 20px;
+    }
+  }
+  
+  .cardt {
+    position: relative;
+  }
+  
+  #delete-comment-btn {
+    border-radius: 50%;
+    color: red;
+    background-color: rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+  }

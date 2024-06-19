@@ -1,0 +1,25 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.text-title {
+    color: white;
+}
+
+.imgAuthor-edit {
+    border-radius: 1%;
+    max-width: 50%;
+    height: 260px;
+    margin-top: 5%;
+}
+
+#btn-back {
+    margin-left: 10px;
+}
+
+#biography {
+    height: 225px;
+}

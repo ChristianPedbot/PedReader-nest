@@ -1,0 +1,24 @@
+.modal-image{
+    height: 50%;
+  }
+  
+  .modal-body{
+    color: rgb(0, 0, 0);
+  }
+  
+  .modal-content {
+    background-color: #73a8f9;
+  }
+  
+  .unavailable-btn{
+    background-color: gray;
+    color: white;
+    height: 40px;
+    border-style: none;
+    border-radius: 8px;  
+    width: 150px;
+  }
+  
+  .unavailable-btn:hover{
+    background-color: #242424;
+  }

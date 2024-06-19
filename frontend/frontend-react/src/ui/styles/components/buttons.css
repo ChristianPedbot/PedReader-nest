@@ -1,0 +1,68 @@
+.buttons{
+    width: 150px;
+    height: 40px;
+    border-style: none;
+    border-radius: 8px;
+    color: white;
+    margin: 5px;
+}
+
+#edit-button{
+    background-color: rgb(61, 61, 61);
+    width: 100px;
+}
+
+#edit-button:hover{
+    background-color: rgb(74, 74, 74);
+}
+
+#rent-button{
+    background-color: #73a8f9;
+    
+}
+
+#rent-button:hover{
+    background-color: #5190ee;
+}
+
+#update-button{
+    background-color: rgb(0, 161, 86);
+}
+
+#update-button:hover{
+    background-color: rgb(0, 116, 62);
+}
+
+#back-button{
+    background-color: rgb(85, 85, 85);
+}
+
+#back-button:hover{
+    background-color: rgb(61, 61, 61);
+}
+
+#edit-profile-button{
+    width: 150px;
+    height: 40px;
+}
+
+#login-btn{
+    background-color: #0066FF;
+}
+
+.container-btn-login{
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+
+#add-button{
+    background-color: rgb(0, 161, 86);
+}
+
+#add-button:hover{
+    background-color: rgb(0, 116, 62);
+}
+
+

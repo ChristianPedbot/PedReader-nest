@@ -1,0 +1,57 @@
+.text-title {
+    color: white;
+}
+
+.imgBook-edit {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+#btn-back,
+#btn-update {
+    width: 100%;
+    margin: 3px;
+}
+
+#description-book {
+    height: auto;
+}
+
+#author-go {
+    text-decoration: none;
+}
+
+#delete-book {
+    float: right;
+    width: 100%;
+}
+
+.btn-up {
+    margin-left: 5px;
+}
+
+.container-edit {
+    background-color: #121212;
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5%;
+
+}
+
+@media (max-width: 768px) {
+    .container-edit {
+        width: 95%;
+    }
+
+    #btn-back,
+    #btn-update,
+    #btn-update-book-img,
+    #delete-book {
+        width: 100%;
+    }
+}

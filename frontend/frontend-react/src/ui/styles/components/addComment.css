@@ -1,0 +1,43 @@
+.container-comment {
+    width: 90%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  body {
+    background-color: #000;
+  }
+  
+  #comment-add {
+    margin-top: 30px;
+    width: calc(100% - 20px);
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+  
+  .input-comment {
+    height: 300px;
+  }
+  
+  @media (min-width: 1200px) {
+    #comment-add {
+      min-width: 1200px;
+    }
+  }
+  
+  #comment-add:hover {
+    background-color: #121212;
+  }
+  
+  #send-comment {
+    float: right;
+    width: 150px;
+    height: 40px;
+  }
+  
+  #label-add-comment {
+    margin-top: 20px;
+    float: left;
+  }
