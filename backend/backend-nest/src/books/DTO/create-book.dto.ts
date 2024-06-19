@@ -5,6 +5,6 @@ export class CreateBookDto {
     date: Date;
     img: string;
     authorId: number;
-    //categorieId: number;
+    categorieId: number;
   }
   

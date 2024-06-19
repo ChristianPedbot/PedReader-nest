@@ -44,7 +44,8 @@ describe('BooksService', () => {
         availability: 0,
         date: new Date(),
         img: 'http://example.com/image.jpg',
-        authorId: 1
+        authorId: 1,
+        categorieId: 14
       };
 
       const book = new BookEntity();
@@ -81,7 +82,8 @@ describe('BooksService', () => {
         availability: 1,
         date: new Date(),
         img: 'http://example.com/image.jpg',
-        authorId: 1
+        authorId: 1,
+        categorieId: 14
       };
 
       const book = new BookEntity();

@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { AuthorEntity } from '../../authors/entities/author.entity';
-//import { CategoriesEntity } from '../../categories/entities/categorie.entitye';
-
+import { CategoryEntity } from '../../categories/entities/category.entity';
 
 @Entity({
     name: 'books'
@@ -13,7 +12,6 @@ export class BookEntity {
     @Column({
         type: 'varchar',
         length: 255,
-        unique: true
     })
     title: string;
 
@@ -25,7 +23,6 @@ export class BookEntity {
 
     @Column({
         type: 'int',
-        unique: true
     })
     availability: number;
 
@@ -35,9 +32,9 @@ export class BookEntity {
     })
     date: Date;
 
-    /*@ManyToOne(() => CategoriesEntity)
+    @ManyToOne(() => CategoryEntity)
     @JoinColumn({ name: 'categorie_id' })
-    categorie: CategoriesEntity;*/
+    categorie: CategoryEntity;
 
     @ManyToOne(() => AuthorEntity)
     @JoinColumn({ name: 'author_id' })

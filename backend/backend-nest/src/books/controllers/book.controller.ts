@@ -19,6 +19,11 @@ export class BooksController {
     return this.booksService.findOne(+id);
   }
 
+  @Get('category/:categoryId')
+  async findByCategory(@Param('categoryId') categoryId: number): Promise<BookEntity[]> {
+    return this.booksService.findByCategory(categoryId);
+  }
+
   @Post()
   async create(@Body() createBookDto: CreateBookDto): Promise<BookEntity> {
     return this.booksService.create(createBookDto);

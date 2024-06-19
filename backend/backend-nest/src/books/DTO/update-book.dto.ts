@@ -5,6 +5,6 @@ export class UpdateBookDto {
     date?: Date;
     img?: string;
     authorId?: number;
-    //categorieId?: number;
+    categorieId?: number;
   }
   
