@@ -1,18 +1,26 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('authors') // nome da tabela no banco de dados
+@Entity('authors')
 export class AuthorEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({
+    type: 'varchar',
+    length: 255
+  })
   name: string;
 
-  @Column({ type: 'text' })
+  @Column({
+    type: 'text'
+  })
   biography: string;
 
-  @Column({ type: 'text', nullable: true })
-  img: string; // url da imagem do autor, pode ser nulo
+  @Column({
+    type: 'longtext',
+    nullable: true
+  })
+  img: string;
 
-  // outras colunas podem ser adicionadas conforme necessário
+
 }

@@ -9,7 +9,7 @@ export default function AddComment({ bookId, userId }) {
         event.preventDefault();
 
         try {
-            await fetch('http://localhost:3000/book/addComments', {
+            await fetch('http://localhost:3000/comments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -20,7 +20,8 @@ export default function AddComment({ bookId, userId }) {
                     comment: comment,
                 }),
             });
-            toast.success("Deu bom")
+            console.log(bookId)
+            toast.success("Comment added successfully")
             setTimeout(() => {
                 window.location.href = `/books/${bookId}`;
             }, 2000);

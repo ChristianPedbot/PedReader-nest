@@ -12,7 +12,7 @@ export const saveTokenToLocalStorage = (token) => {
 
 export const saveUserIdToLocalStorage = (userId) => {
   localStorage.setItem('userId', userId);
-  console.log('O id do usuario foi armazenado, ', userId);
+  console.log('O id do usuário foi armazenado, ', userId);
 };
 
 export const getTokenFromLocalStorage = () => {
@@ -29,7 +29,7 @@ export const getUserIdFromToken = () => {
     const [, payloadBase64] = token.split('.');
     const payloadString = atob(payloadBase64);
     const payload = JSON.parse(payloadString);
-    return payload.userId;
+    return payload.sub; // Use 'sub' para o ID do usuário, se estiver usando o payload padrão do JWT
   }
   return null;
 };
@@ -41,8 +41,8 @@ export const getUserInfoFromServer = async () => {
       const [, payloadBase64] = token.split('.');
       const payloadString = atob(payloadBase64);
       const payload = JSON.parse(payloadString);
-      const userId = payload.userId;
-      const response = await axios.get(`http://localhost:3000/users/get/${userId}`);
+      const userId = payload.sub; // Correção aqui
+      const response = await axios.get(`http://localhost:3000/users/${userId}`);
       const userData = response.data;
       return { userId: userData.id, isAdmin: userData.isAdmin === 1, ...userData };
     } catch (error) {

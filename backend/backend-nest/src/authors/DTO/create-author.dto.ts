@@ -1,6 +1,5 @@
 export class CreateAuthorDto {
-    name: string;
-    biography: string;
-    img: string;
-  }
-  
+  name: string;
+  biography: string;
+  img: string;
+}

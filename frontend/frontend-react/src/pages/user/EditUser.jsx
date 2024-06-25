@@ -23,7 +23,7 @@ export default function EditUser() {
     const fetchUserInfoFromToken = async () => {
       try {
         const userId = getUserIdFromToken();
-        const response = await axios.get(`http://localhost:3000/users/get/${userId}`);
+        const response = await axios.get(`http://localhost:3000/users/${userId}`);
         const userData = response.data;
         setUserInfo(userData);
         setFormData(userData);
@@ -58,23 +58,22 @@ export default function EditUser() {
     }
   };
 
-  const handleSubmit = async (e, userId) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const userId = getUserIdFromToken();
 
     const formDataToSend = new FormData();
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('email', formData.email);
-    formDataToSend.append('telephone', formData.telephone);
-    formDataToSend.append('address', formData.address);
-    formDataToSend.append('city', formData.city);
-    formDataToSend.append('state', formData.state);
-
-    if (formData.img) {
-      formDataToSend.append('img', formData.img);
+    for (const key in formData) {
+      formDataToSend.append(key, formData[key]);
     }
 
     try {
-      const response = await axios.put(`http://localhost:3000/users/edit/${userId}`, formDataToSend);
+      const response = await axios.put(`http://localhost:3000/users/${userId}`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       toast.success('Profile edited successfully!');
       setTimeout(() => {
         window.location.href = `/user/${userId}`;
@@ -83,11 +82,13 @@ export default function EditUser() {
       toast.error('Error editing user profile:', error);
     }
   };
+
   const defaultImageUrl = "https://res.cloudinary.com/dechfylvy/image/upload/v1715889366/user_vhvvtc.png";
 
   if (!userInfo) {
     return <div>Loading...</div>;
   }
+
   return (
     <>
       <div className="all-content">
@@ -101,48 +102,37 @@ export default function EditUser() {
         </div>
       </div>
       <div className="container-edit">
-        <form onSubmit={(e) => handleSubmit(e, userInfo.id)} noValidate className="validated-form" encType="multipart/form-data">
-
+        <form onSubmit={handleSubmit} noValidate className="validated-form" encType="multipart/form-data">
           <div className="row">
             <div className="col-md-12">
               <div className="mb-3">
                 <label className="form-label" htmlFor="name">Name</label>
                 <input className="form-control" type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
-                <div className="valid-feedback">
-                  Looks good
-                </div>
+                <div className="valid-feedback">Looks good</div>
               </div>
               <div className="mb-3">
                 <label className="form-label" htmlFor="email">Email</label>
                 <input className="form-control" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
-                <div className="valid-feedback">
-                  Looks good
-                </div>
+                <div className="valid-feedback">Looks good</div>
               </div>
               <div className="mb-3">
                 <label className="form-label" htmlFor="telephone">Telephone</label>
                 <input className="form-control" type="tel" id="telephone" name="telephone" value={formData.telephone} onChange={handleChange} required />
-                <div className="valid-feedback">
-                  Looks good
-                </div>
+                <div className="valid-feedback">Looks good</div>
               </div>
               <div className="mb-3">
                 <label className="form-label" htmlFor="address">Address</label>
                 <input className="form-control" type="text" id="address" name="address" value={formData.address} onChange={handleChange} required />
-                <div className="valid-feedback">
-                  Looks good
-                </div>
+                <div className="valid-feedback">Looks good</div>
               </div>
               <div className="mb-3">
                 <label className="form-label" htmlFor="city">City</label>
                 <input className="form-control" type="text" id="city" name="city" value={formData.city} onChange={handleChange} required />
-                <div className="valid-feedback">
-                  Looks good
-                </div>
+                <div className="valid-feedback">Looks good</div>
               </div>
-              <div className='mb-3'>
-                <label className='form-label' htmlFor="state">State:</label>
-                <select className='form-control' id="state" name="state" value={formData.state} onChange={handleChange} required>
+              <div className="mb-3">
+                <label className="form-label" htmlFor="state">State</label>
+                <select className="form-control" id="state" name="state" value={formData.state} onChange={handleChange} required>
                   <option value="AC">Acre</option>
                   <option value="AL">Alagoas</option>
                   <option value="AP">Amapá</option>

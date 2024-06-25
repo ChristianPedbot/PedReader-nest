@@ -18,9 +18,10 @@ function BookPage() {
       try {
         const bookResponse = await axiosInstance.get(`/books/${id}`);
         setBook(bookResponse.data);
+        console.log(bookResponse.data)
 
-        const authorId = bookResponse.data.author_id;
-
+        const authorId = bookResponse.data.author.id;
+        console.log(authorId , 'id author')
         const authorResponse = await axiosInstance.get(`/authors/${authorId}`);
         setAuthor(authorResponse.data);
       } catch (error) {

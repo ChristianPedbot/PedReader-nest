@@ -16,7 +16,7 @@ export class LocationsService {
     private bookRepository: Repository<BookEntity>,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
   async create(createLocationDto: CreateLocationDto): Promise<LocationEntity> {
     const { bookId, userId, location_date, ...locationData } = createLocationDto;
@@ -39,7 +39,7 @@ export class LocationsService {
     returnDate.setDate(locationDate.getDate() + 7);
 
     const newLocation = this.locationRepository.create({
-      ...locationData,  
+      ...locationData,
       location_date: locationDate,
       return_date: returnDate,
       book,
@@ -76,7 +76,7 @@ export class LocationsService {
       if (!book) {
         throw new NotFoundException(`Book with ID ${bookId} not found`);
       }
-      book.availability =   0;
+      book.availability = 0;
       await this.bookRepository.save(book);
       location.book = book;
     }
@@ -113,5 +113,13 @@ export class LocationsService {
     await this.bookRepository.save(location.book);
 
     await this.locationRepository.remove(location);
+  }
+
+  async findByUser(userId: number): Promise<LocationEntity[]> {
+    return await this.locationRepository.find({ where: { user: { id: userId } }, relations: ['book', 'user'] });
+  }
+
+  async findByBookId(bookId: number): Promise<LocationEntity[]> {
+    return await this.locationRepository.find({ where: { book: { id: bookId } } });
   }
 }

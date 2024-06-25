@@ -12,23 +12,27 @@ export class BookEntity {
     @Column({
         type: 'varchar',
         length: 255,
+        nullable: true
     })
     title: string;
 
     @Column({
         type: 'varchar',
-        length: 500
+        length: 500,
+        nullable: true
     })
     description: string;
 
     @Column({
         type: 'int',
+        nullable: true
     })
     availability: number;
 
+
     @Column({
         type: 'date',
-        nullable: false 
+        nullable: true
     })
     date: Date;
 
@@ -42,7 +46,7 @@ export class BookEntity {
 
     @Column({
         type: 'longtext',
-        nullable: true 
+        nullable: true
     })
     img: string;
 }

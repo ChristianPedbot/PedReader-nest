@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/components/navbar.css'
-import { logout, isLoggedIn , getUserIdFromToken } from '../../data/utils/localStorage';
+import { logout, isLoggedIn, getUserIdFromToken } from '../../data/utils/localStorage';
 import axios from 'axios';
 
 export default function Navbar() {
@@ -15,7 +15,7 @@ export default function Navbar() {
     const fetchUserInfoFromToken = async () => {
       try {
         const userId = getUserIdFromToken();
-        const response = await axios.get(`http://localhost:3000/users/get/${userId}`);
+        const response = await axios.get(`http://localhost:3000/users/${userId}`);
         const userData = response.data;
         setUserInfo(userData);
       } catch (error) {

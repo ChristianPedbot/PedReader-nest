@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BooksModule } from './books/modules/book.module';
@@ -14,37 +15,45 @@ import { CommentEntity } from './comments/entities/comment.entity';
 import { CommentsModule } from './comments/modules/comment.module';
 import { LocationEntity } from './locations/entities/location.entity';
 import { LocationsModule } from './locations/modules/location.module';
+import { AuthModule } from './users/modules/auth.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // ConfigModule global
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'mysql', 
+      host: 'mysql',
       port: 3306,
       username: 'root',
       password: 'root123',
       database: 'lib',
       entities: [
-        BookEntity, 
-        AuthorEntity, 
-        UserEntity ,
+        BookEntity,
+        AuthorEntity,
+        UserEntity,
         CategoryEntity,
         CommentEntity,
         LocationEntity,
       ],
-      synchronize: true, 
+      synchronize: true,
       extra: {
         authPlugin: 'mysql_native_password',
       },
     }),
-    BooksModule,
-    AuthorsModule,
     UsersModule,
+    AuthorsModule,
     CategoryModule,
+    BooksModule,
     CommentsModule,
-    LocationsModule
+    LocationsModule,
+    AuthModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

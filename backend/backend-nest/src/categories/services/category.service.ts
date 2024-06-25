@@ -9,7 +9,7 @@ export class CategoryService implements OnModuleInit {
   constructor(
     @InjectRepository(CategoryEntity)
     private readonly categoryRepository: Repository<CategoryEntity>,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     const categories = [
@@ -28,7 +28,7 @@ export class CategoryService implements OnModuleInit {
     ];
 
     for (const category of categories) {
-      console.log(`Creating category: ${category.name}`); 
+      console.log(`Creating category: ${category.name}`);
       await this.create(category);
     }
   }

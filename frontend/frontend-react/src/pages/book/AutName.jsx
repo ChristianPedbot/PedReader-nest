@@ -7,20 +7,23 @@ function AuthorName({ authorId }) {
   useEffect(() => {
     const fetchAuthor = async () => {
       try {
+        console.log(authorId, 'id author autname')
         const response = await axios.get(`http://localhost:3000/authors/${authorId}`);
+        console.log(response.data);
         setAuthor(response.data);
       } catch (error) {
+        console.log('Error fetching author:', error);
       }
     };
 
     fetchAuthor();
   }, [authorId]);
-
   if (!author) {
-    return null;
+    return <span>Loading author...</span>;
   }
 
   return <span>{author.name}</span>;
+
 }
 
 export default AuthorName;

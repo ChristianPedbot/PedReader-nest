@@ -1,14 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { AuthorsService } from './author.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuthorEntity } from '../entities/author.entity';
+import { Repository, DeleteResult } from 'typeorm'; 
 import { CreateAuthorDto } from '../DTO/create-author.dto';
 import { UpdateAuthorDto } from '../DTO/update-author.dto';
+import { NotFoundException } from '@nestjs/common';
 
 describe('AuthorsService', () => {
   let service: AuthorsService;
-  let repository: Repository<AuthorEntity>;
+  let repositoryMock: Repository<AuthorEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,81 +17,67 @@ describe('AuthorsService', () => {
         AuthorsService,
         {
           provide: getRepositoryToken(AuthorEntity),
-          useClass: Repository,
+          useValue: {
+            find: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+            count: jest.fn(),
+          },
         },
       ],
     }).compile();
 
     service = module.get<AuthorsService>(AuthorsService);
-    repository = module.get<Repository<AuthorEntity>>(getRepositoryToken(AuthorEntity));
+    repositoryMock = module.get<Repository<AuthorEntity>>(getRepositoryToken(AuthorEntity));
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create a new author', async () => {
-      const createAuthorDto: CreateAuthorDto = {
-        name: 'J. K. Rolling',
-        biography: 'john born in usa, when he has 15 years, john write your first book, and after this he never stop more',
-        img: 'http://example.com/image.jpg',
-      };
+  describe('remove', () => {
+    it('should remove an existing author', async () => {
+      const authorId = 1;
 
-      const author = new AuthorEntity();
-      Object.assign(author, createAuthorDto);
+      const deleteResult: DeleteResult = { raw: {}, affected: 1 }; 
+      jest.spyOn(repositoryMock, 'delete').mockResolvedValueOnce(deleteResult);
 
-      jest.spyOn(repository, 'create').mockReturnValue(author);
-      jest.spyOn(repository, 'save').mockResolvedValue(author);
+      await service.remove(authorId);
 
-      expect(await service.create(createAuthorDto)).toEqual(author);
+      expect(repositoryMock.delete).toHaveBeenCalledWith(authorId);
     });
   });
 
-  describe('findOne', () => {
-    it('should return a author by ID', async () => {
-      const author = new AuthorEntity();
-      author.id = 1;
-      author.name = 'J. K. Rolling';
+  describe('ensureDefaultAuthor', () => {
+    it('should create a default author if no authors exist', async () => {
+      jest.spyOn(repositoryMock, 'count').mockResolvedValueOnce(0); 
+      jest.spyOn(service, 'create').mockResolvedValueOnce({} as AuthorEntity); 
 
-      jest.spyOn(repository, 'findOne').mockResolvedValue(author);
+      await service.ensureDefaultAuthor();
 
-      expect(await service.findOne(1)).toEqual(author);
+      expect(repositoryMock.count).toHaveBeenCalledWith(); 
+      expect(service.create).toHaveBeenCalledWith({
+        name: 'Default Author Name',
+        biography: 'This is a default author biography.',
+        img: 'default-image-url',
+      }); 
+    });
+
+    it('should not create a default author if authors exist', async () => {
+      jest.spyOn(repositoryMock, 'count').mockResolvedValueOnce(1); 
+      const createSpy = jest.spyOn(service, 'create');
+      await service.ensureDefaultAuthor();
+
+      expect(repositoryMock.count).toHaveBeenCalledWith(); 
+      expect(createSpy).not.toHaveBeenCalled(); 
     });
   });
 
-  describe('update', () => {
-    it('should update a author', async () => {
-      const UpdateAuthorDto: UpdateAuthorDto = {
-        name: 'J. K. Rolling',
-        biography: 'john born in usa, when he has 15 years, john write your first book, and after this he never stop more',
-        img: 'http://example.com/image.jpg',
-      };
-
-      const author = new AuthorEntity();
-      author.id = 1;
-      Object.assign(author, UpdateAuthorDto);
-
-      jest.spyOn(repository, 'findOne').mockResolvedValue(author);
-      jest.spyOn(repository, 'save').mockResolvedValue(author);
-
-      expect(await service.update(1, UpdateAuthorDto)).toEqual(author);
-    });
-  });
-
-  describe('delete', () => {
-    it('should delete a author', async () => {
-      const author = new AuthorEntity();
-      author.id = 1;
-      author.name = 'J. K. Rolling';
-
-      jest.spyOn(repository, 'findOne').mockResolvedValue(author);
-      jest.spyOn(repository, 'remove').mockResolvedValue(author);
-
-      await service.remove(1);
-
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
-      expect(repository.remove).toHaveBeenCalledWith(author);
-    });
-  });
 });

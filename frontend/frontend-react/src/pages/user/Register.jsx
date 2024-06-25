@@ -14,12 +14,13 @@ function Register() {
     };
     try {
       toast.info("Registering...");
-      await axios.post('http://localhost:3000/users/add', userData);
+      await axios.post('http://localhost:3000/users', userData);
       toast.success('User registered successfully!');
       setTimeout(() => {
         window.location.href = '/login';
       }, 2000);
     } catch (error) {
+      console.error('Error registering user:', error.response ? error.response.data : error.message);
       toast.error('Error registering user!');
     }
   };
@@ -31,15 +32,15 @@ function Register() {
         <form onSubmit={handleSubmit} method="POST">
           <div className="mb-3">
             <label className="form-label">Name:</label>
-            <input type="text" name="name" className="form-control" placeholder="ex: Terry Crews" />
+            <input type="text" name="name" className="form-control" placeholder="ex: Terry Crews" required />
           </div>
           <div className="mb-3">
             <label className="form-label">Email:</label>
-            <input type="email" name="email" className="form-control" placeholder="ex: email@email.com" />
+            <input type="email" name="email" className="form-control" placeholder="ex: email@email.com" required />
           </div>
           <div className="mb-3">
             <label className="form-label">Password:</label>
-            <input type="password" name="password" className="form-control" placeholder="add a strong password" />
+            <input type="password" name="password" className="form-control" placeholder="add a strong password" required />
           </div>
           <div className="mb-3">
             <a href="/login" className='go-register'>You already have an account? <b>Login now</b></a>

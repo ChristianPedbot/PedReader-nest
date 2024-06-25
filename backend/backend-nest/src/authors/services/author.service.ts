@@ -9,49 +9,56 @@ import { UpdateAuthorDto } from '../DTO/update-author.dto';
 export class AuthorsService {
   constructor(
     @InjectRepository(AuthorEntity)
-    private authorRepository: Repository<AuthorEntity>,
-  ) {}
-
-  async create(createAuthorDto: CreateAuthorDto): Promise<AuthorEntity> {
-    const { name, biography, img } = createAuthorDto;
-    const newAuthor = this.authorRepository.create({ name, biography, img });
-    return await this.authorRepository.save(newAuthor);
-  }
+    private readonly authorRepository: Repository<AuthorEntity>,
+  ) { }
 
   async findAll(): Promise<AuthorEntity[]> {
-    return await this.authorRepository.find();
+    return this.authorRepository.find();
+  }
+
+  async onModuleInit() {
+    await this.ensureDefaultAuthor();
   }
 
   async findOne(id: number): Promise<AuthorEntity> {
     const author = await this.authorRepository.findOne({ where: { id } });
     if (!author) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+      throw new NotFoundException(`Author with id ${id} not found`);
     }
     return author;
   }
 
-  async update(id: number, updateAuthorDto: UpdateAuthorDto): Promise<AuthorEntity> {
-    const { name, biography, img } = updateAuthorDto;
+  async create(createAuthorDto: CreateAuthorDto): Promise<AuthorEntity> {
+    const author = this.authorRepository.create(createAuthorDto);
+    return this.authorRepository.save(author);
+  }
 
-    const authorToUpdate = await this.authorRepository.findOne({ where: { id } });
-    if (!authorToUpdate) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
+  async update(id: number, updateAuthorDto: UpdateAuthorDto): Promise<AuthorEntity> {
+    const author = await this.findOne(id);
+
+    if (updateAuthorDto.img === undefined) {
+      updateAuthorDto.img = author.img; // Mantém a imagem existente se a nova imagem for undefined
     }
 
-    authorToUpdate.name = name || authorToUpdate.name;
-    authorToUpdate.biography = biography || authorToUpdate.biography;
-    authorToUpdate.img = img || authorToUpdate.img;
-
-    return await this.authorRepository.save(authorToUpdate);
+    await this.authorRepository.update(id, updateAuthorDto);
+    const updatedAuthor = await this.findOne(id);
+    return updatedAuthor;
   }
 
   async remove(id: number): Promise<void> {
-    const authorToRemove = await this.authorRepository.findOne({ where: { id } });
-
-    if (!authorToRemove) {
-      throw new NotFoundException(`Author with ID ${id} not found`);
-    }
-
-    await this.authorRepository.remove(authorToRemove);
+    await this.authorRepository.delete(id);
   }
+
+  public async ensureDefaultAuthor() {
+    const count = await this.authorRepository.count();
+    if (count === 0) {
+      const defaultAuthor: CreateAuthorDto = {
+        name: 'Default Author Name',
+        biography: 'This is a default author biography.',
+        img: 'default-image-url',
+      };
+      await this.create(defaultAuthor);
+    }
+  }
+
 }

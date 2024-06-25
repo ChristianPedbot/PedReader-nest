@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/components/modalBook.css'
+import '../styles/components/modalBook.css';
 import axiosInstance from '../../data/axios/axios';
 
 export default function ModalBook({ bookId }) {
@@ -9,12 +9,16 @@ export default function ModalBook({ bookId }) {
   useEffect(() => {
     const fetchReturnDate = async () => {
       try {
-        const response = await axiosInstance.get(`/locations/${bookId}`);
-        const returnDate = response.data.return_date;
-        const separatedDate = returnDate.split("T");
-        const formattedDate = separatedDate[0];
-        setReturnDate(formattedDate);
+        const response = await axiosInstance.get(`/locations/book/${bookId}`);
+        if (response.data && response.data.length > 0) {
+          const firstLocation = response.data[0];
+          const returnDate = firstLocation.return_date;
+          setReturnDate(new Date(returnDate).toLocaleDateString());
+        } else {
+          setError('No return date available');
+        }
       } catch (error) {
+        setError('Error fetching return date');
       }
     };
 
@@ -23,7 +27,9 @@ export default function ModalBook({ bookId }) {
 
   return (
     <>
-      <button className="unavailable-btn" data-bs-toggle="modal" data-bs-target="#exampleModal">Unavailable</button>
+      <button className="unavailable-btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Unavailable
+      </button>
       <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog">
           <div className="modal-content">

@@ -7,7 +7,7 @@ import { CreateCommentDto } from '../DTO/create-comment.dto';
 
 @Controller('comments')
 export class CommentsController {
-    constructor(private readonly commentsService: CommentsService) {}
+    constructor(private readonly commentsService: CommentsService) { }
 
     @Post()
     async create(@Body() createCommentDto: CreateCommentDto): Promise<CommentEntity> {

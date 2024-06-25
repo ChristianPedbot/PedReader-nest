@@ -44,8 +44,8 @@ describe('BooksService', () => {
         availability: 0,
         date: new Date(),
         img: 'http://example.com/image.jpg',
-        authorId: 1,
-        categorieId: 14
+        author_id: 1,
+        categorie_id: 14,
       };
 
       const book = new BookEntity();
@@ -77,29 +77,40 @@ describe('BooksService', () => {
   describe('update', () => {
     it('should update a book', async () => {
       const updateBookDto: UpdateBookDto = {
-        title: 'Harry Tester',
-        description: 'A book with the lowest number of these possible',
+        title: 'Updated Book Title',
+        description: 'Updated description',
         availability: 1,
         date: new Date(),
         img: 'http://example.com/image.jpg',
-        authorId: 1,
-        categorieId: 14
       };
 
-      const book = new BookEntity();
-      book.id = 1;
-      Object.assign(book, updateBookDto);
+      const existingBook = new BookEntity();
+      existingBook.id = 1;
+      Object.assign(existingBook, {
+        title: 'Old Book Title',
+        description: 'Old description',
+        availability: 0,
+        date: new Date('2020-01-01'),
+        img: 'http://example.com/old-image.jpg',
+      });
 
-      const author = new AuthorEntity();
-      author.id = 1;
+      const updatedBook = { ...existingBook, ...updateBookDto };
 
-      jest.spyOn(bookRepository, 'findOne').mockResolvedValue(book);
-      jest.spyOn(bookRepository, 'save').mockResolvedValue(book);
-      jest.spyOn(authorRepository, 'findOne').mockResolvedValue(author);
+      jest.spyOn(bookRepository, 'findOne').mockResolvedValue(existingBook);
+      jest.spyOn(bookRepository, 'merge').mockImplementation((target, source) => {
+        return Object.assign(target, source);
+      });
+      jest.spyOn(bookRepository, 'save').mockResolvedValue(updatedBook);
 
-      expect(await service.update(1, updateBookDto)).toEqual(book);
+      const result = await service.update(1, updateBookDto);
+
+      expect(result).toEqual(updatedBook);
+      expect(bookRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['author', 'categorie'] });
+      expect(bookRepository.merge).toHaveBeenCalledWith(existingBook, updateBookDto);
+      expect(bookRepository.save).toHaveBeenCalledWith(updatedBook);
     });
   });
+
 
   describe('delete', () => {
     it('should delete a book', async () => {
@@ -108,12 +119,11 @@ describe('BooksService', () => {
       book.title = 'Harry Tester';
 
       jest.spyOn(bookRepository, 'findOne').mockResolvedValue(book);
-      jest.spyOn(bookRepository, 'remove').mockResolvedValue(book);
+      jest.spyOn(bookRepository, 'delete').mockResolvedValue({ affected: 1 } as any);
 
       await service.remove(1);
 
-      expect(bookRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
-      expect(bookRepository.remove).toHaveBeenCalledWith(book);
+      expect(bookRepository.delete).toHaveBeenCalledWith(1);
     });
   });
 });

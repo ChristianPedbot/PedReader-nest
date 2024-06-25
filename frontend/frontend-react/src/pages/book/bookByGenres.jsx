@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../../ui/components/Navbar.jsx';
 import Footer from '../../ui/components/Footer.jsx';
-import BooksByGenress from './testebook2.jsx';
+import BooksByGenress from './BookByGenre.jsx';
 import Pagination from '../../ui/components/Pagination.jsx';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';

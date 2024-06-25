@@ -1,16 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity({
-    name: 'users'
-})
+@Entity({ name: 'users' })
 export class UserEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({
         type: 'varchar',
-        length: 255,
-        unique: true
+        length: 255
     })
     name: string;
 
@@ -23,55 +20,52 @@ export class UserEntity {
 
     @Column({
         type: 'varchar',
-        length: 255,
-        unique: true
+        length: 255
     })
     password: string;
 
     @Column({
         type: 'varchar',
         length: 15,
-        unique: false
+        nullable: true
     })
     telephone: string;
 
-    @Column ({
+    @Column({
         type: 'varchar',
         length: 50,
-        unique: false
+        nullable: true
     })
     address: string;
 
     @Column({
         type: 'varchar',
         length: 25,
-        unique: false
+        nullable: true
     })
     city: string;
 
     @Column({
         type: 'varchar',
         length: 2,
-        unique: false
+        nullable: true
     })
     state: string;
 
     @Column({
         type: 'longtext',
-        nullable: true 
+        nullable: true
     })
     img: string;
 
     @Column({
         type: 'tinyint',
-        unique: true,
         default: 0
     })
     isAdmin: number;
 
     @Column({
-        type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP'
+        type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'
     })
     createdAt: Date;
 

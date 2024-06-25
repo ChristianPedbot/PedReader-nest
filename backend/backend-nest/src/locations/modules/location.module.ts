@@ -11,4 +11,4 @@ import { UserEntity } from '../../users/entities/user.entity';
   providers: [LocationsService],
   controllers: [LocationsController],
 })
-export class LocationsModule {}
+export class LocationsModule { }

@@ -1,25 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LocationsService } from './location.service';
+import { CommentsService } from './comment.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { LocationEntity } from '../entities/location.entity';
+import { CommentEntity } from '../entities/comment.entity';
 import { BookEntity } from '../../books/entities/book.entity';
 import { UserEntity } from '../../users/entities/user.entity';
-import { CreateLocationDto } from '../DTO/create-location.dto';
-import { UpdateLocationDto } from '../DTO/update-location.dto';
+import { CreateCommentDto } from '../DTO/create-comment.dto';
 import { NotFoundException } from '@nestjs/common';
 
-describe('LocationsService', () => {
-  let service: LocationsService;
-  let locationRepositoryMock: any;
+describe('CommentsService', () => {
+  let service: CommentsService;
+  let commentRepositoryMock: any;
   let bookRepositoryMock: any;
   let userRepositoryMock: any;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        LocationsService,
+        CommentsService,
         {
-          provide: getRepositoryToken(LocationEntity),
+          provide: getRepositoryToken(CommentEntity),
           useValue: {
             find: jest.fn(),
             findOne: jest.fn(),
@@ -32,7 +31,6 @@ describe('LocationsService', () => {
           provide: getRepositoryToken(BookEntity),
           useValue: {
             findOne: jest.fn(),
-            save: jest.fn(),
           },
         },
         {
@@ -44,8 +42,8 @@ describe('LocationsService', () => {
       ],
     }).compile();
 
-    service = module.get<LocationsService>(LocationsService);
-    locationRepositoryMock = module.get(getRepositoryToken(LocationEntity));
+    service = module.get<CommentsService>(CommentsService);
+    commentRepositoryMock = module.get(getRepositoryToken(CommentEntity));
     bookRepositoryMock = module.get(getRepositoryToken(BookEntity));
     userRepositoryMock = module.get(getRepositoryToken(UserEntity));
   });
@@ -59,37 +57,35 @@ describe('LocationsService', () => {
   });
 
   describe('create', () => {
-    it('should create a new location', async () => {
-      const createLocationDto: CreateLocationDto = {
+    it('should create a new comment', async () => {
+      const createCommentDto: CreateCommentDto = {
+        comment: 'Test comment',
         bookId: 1,
         userId: 1,
-        return_date: new Date(),
       };
 
-      const mockLocation = new LocationEntity();
-      mockLocation.book = {} as BookEntity;
-      mockLocation.user = {} as UserEntity;
+      const mockComment = new CommentEntity();
+      mockComment.comment = createCommentDto.comment;
 
       jest.spyOn(bookRepositoryMock, 'findOne').mockResolvedValueOnce({ id: 1 } as BookEntity);
       jest.spyOn(userRepositoryMock, 'findOne').mockResolvedValueOnce({ id: 1 } as UserEntity);
-      jest.spyOn(bookRepositoryMock, 'save').mockResolvedValueOnce({} as BookEntity);
-      jest.spyOn(locationRepositoryMock, 'create').mockReturnValue(mockLocation);
-      jest.spyOn(locationRepositoryMock, 'save').mockResolvedValueOnce(mockLocation);
+      jest.spyOn(commentRepositoryMock, 'create').mockReturnValue(mockComment);
+      jest.spyOn(commentRepositoryMock, 'save').mockResolvedValue(mockComment);
 
-      const result = await service.create(createLocationDto);
-      expect(result).toEqual(mockLocation);
+      const result = await service.create(createCommentDto);
+      expect(result).toEqual(mockComment);
     });
 
     it('should throw NotFoundException when book not found', async () => {
-      const createLocationDto: CreateLocationDto = {
+      const createCommentDto: CreateCommentDto = {
+        comment: 'Test comment',
         bookId: 999, 
         userId: 1,
-        return_date: new Date(),
       };
 
       jest.spyOn(bookRepositoryMock, 'findOne').mockResolvedValueOnce(undefined);
 
-      await expect(service.create(createLocationDto)).rejects.toThrowError(NotFoundException);
+      await expect(service.create(createCommentDto)).rejects.toThrowError(NotFoundException);
     });
   });
 });

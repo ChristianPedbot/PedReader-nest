@@ -1,12 +1,17 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { BookEntity } from '../entities/book.entity';
 import { BooksService } from '../services/book.service';
 import { CreateBookDto } from '../DTO/create-book.dto';
 import { UpdateBookDto } from '../DTO/update-book.dto';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly cloudinaryService: CloudinaryService
+  ) { }
 
   @Get()
   async findAll(): Promise<BookEntity[]> {
@@ -15,7 +20,6 @@ export class BooksController {
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<BookEntity> {
-    console.log(`Controller received ID: ${id}`); 
     return this.booksService.findOne(+id);
   }
 
@@ -25,13 +29,32 @@ export class BooksController {
   }
 
   @Post()
-  async create(@Body() createBookDto: CreateBookDto): Promise<BookEntity> {
-    return this.booksService.create(createBookDto);
+  @UseInterceptors(FileInterceptor('img'))
+  async create(
+    @Body() createBookDto: CreateBookDto,
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<BookEntity> {
+    let img = null;
+    if (file) {
+      img = await this.cloudinaryService.uploadImage(file);
+    }
+    const book = await this.booksService.create({ ...createBookDto, img });
+    return book;
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto): Promise<BookEntity> {
-    return this.booksService.update(+id, updateBookDto);
+  @UseInterceptors(FileInterceptor('img'))
+  async update(
+    @Param('id') id: string,
+    @Body() updateBookDto: UpdateBookDto,
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<BookEntity> {
+    let img = null;
+    if (file) {
+      img = await this.cloudinaryService.uploadImage(file);
+    }
+    const book = await this.booksService.update(+id, { ...updateBookDto, img: img ?? undefined });
+    return book;
   }
 
   @Delete(':id')

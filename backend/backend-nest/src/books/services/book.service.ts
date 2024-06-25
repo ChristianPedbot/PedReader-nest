@@ -4,105 +4,74 @@ import { Repository } from 'typeorm';
 import { BookEntity } from '../entities/book.entity';
 import { CreateBookDto } from '../DTO/create-book.dto';
 import { UpdateBookDto } from '../DTO/update-book.dto';
-import { AuthorEntity } from '../../authors/entities/author.entity';
-import { CategoryEntity } from '../../categories/entities/category.entity';
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectRepository(BookEntity)
-    private bookRepository: Repository<BookEntity>,
-    @InjectRepository(AuthorEntity)
-    private authorRepository: Repository<AuthorEntity>,
-    @InjectRepository(CategoryEntity)
-    private categoryRepository: Repository<CategoryEntity>,
+    private readonly bookRepository: Repository<BookEntity>,
   ) {}
 
-  async create(createBookDto: CreateBookDto): Promise<BookEntity> {
-    const { authorId, categorieId, ...bookData } = createBookDto;
-
-    const author = await this.authorRepository.findOne({ where: { id: authorId } });
-    if (!author) {
-      throw new NotFoundException(`Author with ID ${authorId} not found`);
-    }
-
-    const category = await this.categoryRepository.findOne({ where: { id: categorieId } });
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${categorieId} not found`);
-    }
-
-    const newBook = this.bookRepository.create({  
-      ...bookData,
-      author,
-      categorie: category,
-    });
-
-    return await this.bookRepository.save(newBook);
+  async onModuleInit() {
+    await this.ensureDefaultBook();
   }
 
+
   async findAll(): Promise<BookEntity[]> {
-    return await this.bookRepository.find({ relations: ['author', 'categorie'] });
+    return this.bookRepository.find();
   }
 
   async findOne(id: number): Promise<BookEntity> {
-    const book = await this.bookRepository.findOne({ where: { id }, relations: ['author', 'categorie'] });
-
-    if (!book) {
-      throw new NotFoundException(`Book with ID ${id} not found`);
-    }
-
-    return book;
-  }
-
-  async update(id: number, updateBookDto: UpdateBookDto): Promise<BookEntity> {
-    const { authorId, categorieId, ...bookData } = updateBookDto;
-
-    const author = await this.authorRepository.findOne({ where: { id: authorId } });
-    if (!author) {
-      throw new NotFoundException(`Author with ID ${authorId} not found`);
-    }
-
-    const category = await this.categoryRepository.findOne({ where: { id: categorieId } });
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${categorieId} not found`);
-    }
-
-    const bookToUpdate = await this.bookRepository.findOne({ where: { id } });
-    if (!bookToUpdate) {
-      throw new NotFoundException(`Book with ID ${id} not found`);
-    }
-
-    bookToUpdate.title = bookData.title || bookToUpdate.title;
-    bookToUpdate.description = bookData.description || bookToUpdate.description;
-    bookToUpdate.availability = bookData.availability || bookToUpdate.availability;
-    bookToUpdate.date = bookData.date || bookToUpdate.date;
-    bookToUpdate.img = bookData.img || bookToUpdate.img;
-    bookToUpdate.author = author;
-    bookToUpdate.categorie = category;
-
-    return await this.bookRepository.save(bookToUpdate);
-  }
-
-  async remove(id: number): Promise<void> {
-    const bookToRemove = await this.bookRepository.findOne({ where: { id } });
-
-    if (!bookToRemove) {
-      throw new NotFoundException(`Book with ID ${id} not found`);
-    }
-
-    await this.bookRepository.remove(bookToRemove);
+    return this.bookRepository.findOne({
+      where: { id },
+      relations: ['author', 'categorie'],
+    });
   }
 
   async findByCategory(categoryId: number): Promise<BookEntity[]> {
-    const books = await this.bookRepository.find({
-      where: { categorie: { id: categoryId } },
-      relations: ['author', 'categorie'],
+    return this.bookRepository.find({ where: { categorie: { id: categoryId } }, relations: ['categorie'] });
+  }
+
+  async create(createBookDto: CreateBookDto): Promise<BookEntity> {
+    const book = this.bookRepository.create(createBookDto);
+    return this.bookRepository.save(book);
+  }
+
+  async update(id: number, updateBookDto: UpdateBookDto): Promise<BookEntity> {
+    const book = await this.bookRepository.findOne({
+      where: { id },
+      relations: ['categorie', 'author'],
     });
 
-    if (!books.length) {
-      throw new NotFoundException(`No books found for category with ID ${categoryId}`);
+    if (!book) {
+      throw new NotFoundException(`Book with ID ${id} not found.`);
     }
-    
-    return books;
+
+    this.bookRepository.merge(book, updateBookDto);
+
+    await this.bookRepository.save(book);
+
+    return this.findOne(id);
+  }
+
+
+  public async ensureDefaultBook() {
+    const count = await this.bookRepository.count();
+    if (count === 0) {
+      const defaultBook: CreateBookDto = {
+        title: 'First Book',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vehicula nunc sed lectus malesuada, vitae placerat enim faucibus. Duis fermentum turpis id orci luctus, vel dapibus arcu ultricies. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed in libero vel nisi laoreet consectetur.',
+        availability: 1,
+        date: new Date(),
+        categorie_id: 14,  
+        author_id: 1,    
+        img: 'https://res.cloudinary.com/dechfylvy/image/upload/v1719245763/colfx7jlix6hsmzxkdtk.jpg',
+      };
+      await this.create(defaultBook);
+    }
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.bookRepository.delete(id);
   }
 }

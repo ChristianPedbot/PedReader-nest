@@ -13,6 +13,7 @@ function EditAuthor() {
     biography: '',
     img: ''
   });
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     const fetchAuthor = async () => {
@@ -20,6 +21,7 @@ function EditAuthor() {
         const authorResponse = await axios.get(`http://localhost:3000/authors/${id}`);
         setAuthor(authorResponse.data);
       } catch (error) {
+        console.error('Error fetching author:', error);
       }
     };
 
@@ -31,16 +33,22 @@ function EditAuthor() {
     setAuthor({ ...author, [name]: value });
   };
 
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const formData = new FormData();
     formData.append('name', author.name);
     formData.append('biography', author.biography);
-    formData.append('img', e.target.elements.img.files[0]);
-
+    if (selectedFile) {
+      formData.append('img', selectedFile);
+    }
+  
     try {
-      await axios.put(`http://localhost:3000/authors/edit/${id}`, formData, {
+      await axios.put(`http://localhost:3000/authors/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -50,36 +58,39 @@ function EditAuthor() {
         window.location.href = `/authors/${id}`;
       }, 2500);
     } catch (error) {
-      toast.error('Error when trying to edit the author.');
+      if (error.response) {
+        console.error('Server error:', error.response.data);
+        toast.error('Server error. Please try again later.');
+      } else if (error.request) {
+        console.error('No response from server:', error.request);
+        toast.error('No response from server. Please try again later.');
+      } else {
+        console.error('Request setup error:', error.message);
+        toast.error('Request setup error. Please try again later.');
+      }
     }
   };
-
 
   return (
     <div className="container-edit">
       <form onSubmit={handleSubmit} noValidate className="validated-form" encType="multipart/form-data">
-
         <div className="row">
           <h1 className="text-title">Edit Author</h1>
-          <center><img className="imgAuthor-edit" src={author.img} alt="" /></center>
+          <center><img className="imgAuthor-edit" src={author.img} alt={author.name} /></center>
           <div className="col-md-12">
             <div className="mb-3">
               <label className="form-label" htmlFor="name">Name</label>
               <input className="form-control" type="text" id="name" name="name" value={author.name} onChange={handleInputChange} required />
-              <div className="valid-feedback">
-                Looks good
-              </div>
+              <div className="valid-feedback">Looks good</div>
             </div>
             <div className="mb-3">
               <label className="form-label" htmlFor="biography">Biography</label>
               <textarea className="form-control" id="biography" name="biography" value={author.biography} onChange={handleInputChange} required></textarea>
-              <div className="valid-feedback">
-                Looks good
-              </div>
+              <div className="valid-feedback">Looks good</div>
             </div>
             <div className="mb-3">
               <label className="form-label" htmlFor="img">Change main image</label>
-              <input className="form-control" type="file" name="img" multiple />
+              <input className="form-control" type="file" name="img" onChange={handleFileChange} />
             </div>
           </div>
         </div>
@@ -87,8 +98,6 @@ function EditAuthor() {
         <UpdateButton />
       </form>
     </div>
-
-
   );
 }
 

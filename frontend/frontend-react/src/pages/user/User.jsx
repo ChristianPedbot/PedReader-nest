@@ -16,7 +16,7 @@ function User() {
     const fetchUserInfoFromToken = async () => {
       try {
         const userId = getUserIdFromToken();
-        const response = await axios.get(`http://localhost:3000/users/get/${userId}`);
+        const response = await axios.get(`http://localhost:3000/users/${userId}`);
         const userData = response.data;
         setUserInfo(userData);
       } catch (error) {

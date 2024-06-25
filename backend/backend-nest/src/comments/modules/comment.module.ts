@@ -14,4 +14,4 @@ import { UserEntity } from '../../users/entities/user.entity';
   providers: [CommentsService],
   controllers: [CommentsController],
 })
-export class CommentsModule {}
+export class CommentsModule { }

@@ -1,5 +1,3 @@
-// src/services/comments.service.ts
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,7 +15,7 @@ export class CommentsService {
         private bookRepository: Repository<BookEntity>,
         @InjectRepository(UserEntity)
         private userRepository: Repository<UserEntity>,
-    ) {}
+    ) { }
 
     async create(createCommentDto: CreateCommentDto): Promise<CommentEntity> {
         const { comment, bookId, userId } = createCommentDto;
@@ -32,7 +30,7 @@ export class CommentsService {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
 
-        const newComment = this.commentRepository.create({  
+        const newComment = this.commentRepository.create({
             comment,
             book,
             user,
@@ -92,10 +90,10 @@ export class CommentsService {
 
     async findByBook(bookId: number): Promise<CommentEntity[]> {
         const comments = await this.commentRepository.find({
-            where: { book: { id: bookId } }, // Aqui estamos buscando todos os comentários relacionados a um livro pelo ID do livro
+            where: { book: { id: bookId } }, 
             relations: ['book', 'user'],
         });
 
-        return comments; // Retorna uma lista de comentários relacionados ao livro com o ID fornecido
+        return comments;
     }
 }

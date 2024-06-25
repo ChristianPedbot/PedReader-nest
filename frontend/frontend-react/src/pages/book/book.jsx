@@ -27,7 +27,7 @@ function Book({ book }) {
 
   const handleDeleteBook = async (id) => {
     try {
-      await axiosInstance.delete(`/books/delete/${id}`);
+      await axiosInstance.delete(`/books/${id}`);
       toast.success('Book deleted successfully!');
       setTimeout(() => {
         window.location.href = `/books`;
@@ -49,11 +49,11 @@ function Book({ book }) {
     }
   };
 
-  if (!book) {
-    return null;
+  if (!book || !book.author) {
+    return null; 
   }
 
-  const { id, title, description, rating, author_id, availability } = book;
+  const { id, title, description, rating, author, availability } = book;
 
   return (
     <div className='book-container'>
@@ -66,21 +66,25 @@ function Book({ book }) {
             <div className="col-md-8">
               <div className="book-body">
                 <h5 className="book-title mt-5">{title}</h5>
-                <Link className='author-name' to={`/authors/${author_id}`} reloadDocument>
-                  <AuthorName authorId={author_id} />
+                <Link className='author-name' to={`/authors/${author.id}`} reloadDocument>
+                  <AuthorName authorId={author.id} />
                 </Link>
                 <p className='description mt-3'>{description}</p>
+                <span className={userIsAdmin != null ? 'hidden' : ''}>
                 {userIsAdmin && (
                   <button type="button" id="delete" className="btn btn-danger" onClick={() => handleDeleteBook(id)}>X</button>
                 )}
+                </span>
                 <div className="card-footer">
                   <div className="btn-adm mt-3">
+                  <span className={userIsAdmin != null ? 'hidden' : ''}>
                     {userIsAdmin && (
                       <Link className='edit-button' to={`/books/${id}/edit`} reloadDocument>
                         <EditButton id={id} />
                       </Link>
                     )}
-                    {availability == 0 ? (
+                    </span>
+                    {availability === 0 ? (
                       <form className="btn-form" onSubmit={(e) => { e.preventDefault(); handleAddLocation(id); }}>
                         <RentButton />
                       </form>
@@ -94,7 +98,7 @@ function Book({ book }) {
           </div>
         </div>
       </div>
-      <AddComment bookId={book.id} userId={userId} />
+      <AddComment bookId={id} userId={userId} />
       <Comments bookId={book.id} />
     </div>
   );

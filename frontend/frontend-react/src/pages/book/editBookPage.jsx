@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
 import Navbar from '../../ui/components/Navbar.jsx';
 import Footer from '../../ui/components/Footer.jsx';
 import ProtectedRouteAdmin from '../../data/protection/AdminProtectedRoute.jsx';
-import EditBooks from './testbook.jsx';
+import EditBooks from './EditBook.jsx';
 
 function EditBookApp() {
   const { id } = useParams();
@@ -12,20 +12,24 @@ function EditBookApp() {
   const [author, setAuthor] = useState(null);
 
   useEffect(() => {
-    const fetchBook = async () => {
+    const fetchBookAndAuthor = async () => {
       try {
-        const bookResponse = await axios.get(`http://localhost:3000/book/${id}`);
-        setBook(bookResponse.data);
+        const bookResponse = await axios.get(`http://localhost:3000/books/${id}`);
+        const fetchedBook = bookResponse.data;
+        setBook(fetchedBook);
 
-        const authorId = bookResponse.data.author_id;
-        const authorResponse = await axios.get(`http://localhost:3000/authors/${authorId}`);
-        setAuthor(authorResponse.data);
+        if (fetchedBook.author.id) {
+          const authorResponse = await axios.get(`http://localhost:3000/authors/${fetchedBook.author.id}`);
+          setAuthor(authorResponse.data);
+        } else {
+          setAuthor(null);
+        }
       } catch (error) {
-
+        console.error('Error fetching book and author:', error);
       }
     };
 
-    fetchBook();
+    fetchBookAndAuthor();
   }, [id]);
 
   return (

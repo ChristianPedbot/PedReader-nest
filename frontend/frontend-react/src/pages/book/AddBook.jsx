@@ -10,8 +10,8 @@ function AddBook({ authors }) {
     description: '',
     availability: '0',
     date: '',
-    categorie_id: '14',
-    author_id: authors.length > 0 ? authors[0].id : '',
+    categorie: '14',
+    author: authors.length > 0 ? authors[0].id : '',
     img: null
   });
 
@@ -33,6 +33,11 @@ function AddBook({ authors }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (!formData.author) {
+      toast.error('Please select an author.');
+      return;
+    }
+
     const formDataToSend = new FormData();
     for (const key in formData) {
       formDataToSend.append(key, formData[key]);
@@ -40,15 +45,27 @@ function AddBook({ authors }) {
 
     try {
       toast.info("Adding book...");
-      await axios.post('http://localhost:3000/books/add', formDataToSend);
-      toast.success("Book added successfully!");
-      setTimeout(() => {
-        window.location.href = '/books';
-      }, 2000);
+      const response = await axios.post('http://localhost:3000/books', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        timeout: 60000
+      });
+
+      if (response.status === 201) {
+        toast.success("Book added successfully!");
+        setTimeout(() => {
+          window.location.href = '/books';
+        }, 2000);
+      } else {
+        toast.error('Failed to add book. Please try again.');
+      }
     } catch (error) {
+      console.error('Error response:', error.response);
       toast.error('Error adding book. Please try again.');
     }
   };
+
 
   return (
     <div className="row text-white">
@@ -77,12 +94,12 @@ function AddBook({ authors }) {
             </select>
           </div>
           <div className="mb-3">
-            <label className="form-label" htmlFor="date">Data:</label>
+            <label className="form-label" htmlFor="date">Date:</label>
             <input className="form-control" type="date" id="date" name="date" value={formData.date} onChange={handleChange} required />
           </div>
           <div className="mb-3">
             <label className="form-label" htmlFor="genres">Genre:</label>
-            <select className="form-control" id="genres" name="categorie_id" value={formData.categorie_id} onChange={handleChange}>
+            <select className="form-control" id="genres" name="categorie" value={formData.categorie} onChange={handleChange}>
               <option value="14">Fiction</option>
               <option value="15">Romance</option>
               <option value="16">Horror</option>
@@ -99,7 +116,7 @@ function AddBook({ authors }) {
           </div>
           <div className="mb-3">
             <label className="form-label" htmlFor="name-author">Author:</label>
-            <select className="form-control" id="name-author" name="author_id" value={formData.author_id} onChange={handleChange}>
+            <select className="form-control" id="name-author" name="author" value={formData.author} onChange={handleChange}>
               {authors.map(author => (
                 <option key={author.id} value={author.id}>{author.name}</option>
               ))}
@@ -108,7 +125,7 @@ function AddBook({ authors }) {
 
           <div className="container-img mb-3">
             <label className="form-label" htmlFor="name-author">Image:</label>
-            <input className="form-control" type="file" name="img" onChange={handleFileChange} multiple />
+            <input className="form-control" type="file" name="img" onChange={handleFileChange} />
           </div>
           <AddBookButton />
         </form>
