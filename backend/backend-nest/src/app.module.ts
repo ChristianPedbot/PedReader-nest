@@ -17,12 +17,22 @@ import { LocationEntity } from './locations/entities/location.entity';
 import { LocationsModule } from './locations/modules/location.module';
 import { AuthModule } from './users/modules/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
+import { join } from 'path';
+import { BookResolver } from './graphql/books/resolvers/book.resolver';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // ConfigModule global
+      isGlobal: true,
+    }),
+
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true, 
+
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -56,4 +66,4 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

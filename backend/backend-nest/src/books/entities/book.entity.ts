@@ -1,52 +1,62 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { AuthorEntity } from '../../authors/entities/author.entity';
 import { CategoryEntity } from '../../categories/entities/category.entity';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @Entity({
-    name: 'books'
+  name: 'books'
 })
+@ObjectType()
 export class BookEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  @Field(() => Int)
+  id: number;
 
-    @Column({
-        type: 'varchar',
-        length: 255,
-        nullable: true
-    })
-    title: string;
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true
+  })
+  @Field({ nullable: true })
+  title: string;
 
-    @Column({
-        type: 'varchar',
-        length: 500,
-        nullable: true
-    })
-    description: string;
+  @Column({
+    type: 'varchar',
+    length: 500,
+    nullable: true
+  })
+  @Field({ nullable: true })
+  description: string;
 
-    @Column({
-        type: 'int',
-        nullable: true
-    })
-    availability: number;
+  @Column({
+    type: 'int',
+    nullable: true
+  })
+  @Field(() => Int, { nullable: true })
+  availability: number;
 
+  @Column({
+    type: 'varchar',
+    length: 20,
+    nullable: true
+  })
+  @Field({ nullable: true })
+  date: string;
 
-    @Column({
-        type: 'date',
-        nullable: true
-    })
-    date: Date;
+  @ManyToOne(() => CategoryEntity)
+  @JoinColumn({ name: 'category_id' })
+  @Field(() => CategoryEntity)
+  category: CategoryEntity;
 
-    @ManyToOne(() => CategoryEntity)
-    @JoinColumn({ name: 'categorie_id' })
-    categorie: CategoryEntity;
+  @ManyToOne(() => AuthorEntity)
+  @JoinColumn({ name: 'author_id' })
+  @Field(() => AuthorEntity)
+  author: AuthorEntity;
 
-    @ManyToOne(() => AuthorEntity)
-    @JoinColumn({ name: 'author_id' })
-    author: AuthorEntity;
-
-    @Column({
-        type: 'longtext',
-        nullable: true
-    })
-    img: string;
+  @Column({
+    type: 'longtext',
+    nullable: true
+  })
+  @Field({ nullable: true })
+  img: string;
 }

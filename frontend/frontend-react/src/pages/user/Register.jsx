@@ -1,9 +1,12 @@
 import React from 'react';
-import axios from 'axios';
+import { useMutation } from '@apollo/client';
 import { toast } from 'react-toastify';
 import RegisterButton from '../../ui/components/buttons/register';
+import { CREATE_USER } from '../../data/mutations/createUser';
 
 function Register() {
+  const [createUser] = useMutation(CREATE_USER);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -12,15 +15,20 @@ function Register() {
       email: formData.get('email'),
       password: formData.get('password')
     };
+
     try {
       toast.info("Registering...");
-      await axios.post('http://localhost:3000/users', userData);
+      await createUser({
+        variables: {
+          createUserInput: userData
+        }
+      });
       toast.success('User registered successfully!');
       setTimeout(() => {
         window.location.href = '/login';
       }, 2000);
     } catch (error) {
-      console.error('Error registering user:', error.response ? error.response.data : error.message);
+      console.error('Error registering user:', error.message);
       toast.error('Error registering user!');
     }
   };

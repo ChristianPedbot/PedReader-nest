@@ -1,41 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
+import React from 'react';
+import { useQuery } from '@apollo/client';
+import { useParams } from 'react-router-dom';
 import Navbar from '../../ui/components/Navbar.jsx';
 import Footer from '../../ui/components/Footer.jsx';
 import ProtectedRouteAdmin from '../../data/protection/AdminProtectedRoute.jsx';
 import EditBooks from './EditBook.jsx';
+import { GET_BOOK_DETAILS } from '../../data/mutations/getBookDetails.js';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 function EditBookApp() {
   const { id } = useParams();
-  const [book, setBook] = useState(null);
-  const [author, setAuthor] = useState(null);
 
-  useEffect(() => {
-    const fetchBookAndAuthor = async () => {
-      try {
-        const bookResponse = await axios.get(`http://localhost:3000/books/${id}`);
-        const fetchedBook = bookResponse.data;
-        setBook(fetchedBook);
+  const { loading, error, data } = useQuery(GET_BOOK_DETAILS, {
+    variables: { id: parseInt(id) },
+  });
 
-        if (fetchedBook.author.id) {
-          const authorResponse = await axios.get(`http://localhost:3000/authors/${fetchedBook.author.id}`);
-          setAuthor(authorResponse.data);
-        } else {
-          setAuthor(null);
-        }
-      } catch (error) {
-        console.error('Error fetching book and author:', error);
-      }
-    };
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
-    fetchBookAndAuthor();
-  }, [id]);
+  const book = data?.book;
 
   return (
     <div>
       <Navbar />
-      <EditBooks book={book} author={author} />
+      {book ? <EditBooks book={book} /> : <p>No book found</p>}
       <Footer />
     </div>
   );

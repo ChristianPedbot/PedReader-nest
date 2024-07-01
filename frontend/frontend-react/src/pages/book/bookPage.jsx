@@ -1,40 +1,48 @@
-import { BrowserRouter, Routes, Route, useParams, Navigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
+import { useParams , BrowserRouter,Route, Routes } from 'react-router-dom';
+import { useQuery, gql } from '@apollo/client';
 import Navbar from '../../ui/components/Navbar.jsx';
 import Footer from '../../ui/components/Footer.jsx';
 import Book from './book.jsx';
-import axiosInstance from '../../data/axios/axios.js';
 import ProtectedRoute from '../../data/protection/ProtectedRoute.jsx';
 
+const GET_BOOK_DETAILS = gql`
+  query GetBookDetails($id: Int!) {
+    book(id: $id) {
+      id
+      title
+      description
+      img
+      availability
+      date
+      author {
+        id
+        name
+      }
+      category {
+        id
+        name
+      }
+    }
+  }
+`;
 
 function BookPage() {
   const { id } = useParams();
-  const [book, setBook] = useState(null);
-  const [author, setAuthor] = useState(null);
 
-  useEffect(() => {
-    const fetchBook = async () => {
-      try {
-        const bookResponse = await axiosInstance.get(`/books/${id}`);
-        setBook(bookResponse.data);
-        console.log(bookResponse.data)
+  const { loading, error, data } = useQuery(GET_BOOK_DETAILS, {
+    variables: { id: Number(id) },
+  });
 
-        const authorId = bookResponse.data.author.id;
-        console.log(authorId , 'id author')
-        const authorResponse = await axiosInstance.get(`/authors/${authorId}`);
-        setAuthor(authorResponse.data);
-      } catch (error) {
-      }
-    };
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
-    fetchBook();
-  }, [id]);
+  const { book } = data;
 
   return (
     <div>
       <Navbar />
-      <Book book={book} author={author} />
+      <Book book={book} />
       <Footer />
     </div>
   );

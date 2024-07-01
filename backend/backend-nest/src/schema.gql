@@ -1,0 +1,50 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Book {
+  id: Int!
+  title: String!
+  description: String!
+  img: String!
+  availability: Int!
+  date: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+type Query {
+  books: [Book!]!
+  book(id: Int!): Book!
+  booksByCategory(categoryId: Int!): [Book!]!
+}
+
+type Mutation {
+  createBook(createBookInput: CreateBookInput!): Book!
+  updateBook(id: Int!, updateBookInput: UpdateBookInput!): Book!
+  removeBook(id: Int!): Boolean!
+}
+
+input CreateBookInput {
+  title: String!
+  description: String!
+  img: String!
+  availability: Int!
+  date: DateTime!
+  categorie_id: Int!
+  author_id: Int!
+}
+
+input UpdateBookInput {
+  title: String
+  description: String
+  img: String
+  availability: Int
+  date: DateTime!
+  categorie_id: Int
+  author_id: Int
+  id: Int!
+}

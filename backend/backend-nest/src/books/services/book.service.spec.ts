@@ -42,7 +42,7 @@ describe('BooksService', () => {
         title: 'Harry Tester',
         description: 'A book with the greatest number of these possible',
         availability: 0,
-        date: new Date(),
+        date: '2020-02-02',
         img: 'http://example.com/image.jpg',
         author_id: 1,
         categorie_id: 14,
@@ -80,7 +80,7 @@ describe('BooksService', () => {
         title: 'Updated Book Title',
         description: 'Updated description',
         availability: 1,
-        date: new Date(),
+        date: '2023-02-03',
         img: 'http://example.com/image.jpg',
       };
 
@@ -90,7 +90,7 @@ describe('BooksService', () => {
         title: 'Old Book Title',
         description: 'Old description',
         availability: 0,
-        date: new Date('2020-01-01'),
+        date: '2020-01-01',
         img: 'http://example.com/old-image.jpg',
       });
 

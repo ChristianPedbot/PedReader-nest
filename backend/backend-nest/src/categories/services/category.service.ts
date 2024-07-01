@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CategoryEntity } from '../entities/category.entity';
 import { CreateCategoryDto } from '../DTO/create-category.dto';
+import { CreateCategoryInput } from '../../graphql/categories/inputs/create-category.input';
 
 @Injectable()
 export class CategoryService implements OnModuleInit {
@@ -28,12 +29,16 @@ export class CategoryService implements OnModuleInit {
     ];
 
     for (const category of categories) {
-      console.log(`Creating category: ${category.name}`);
-      await this.create(category);
+      await this.createWithId(category);
     }
   }
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<CategoryEntity> {
+  async create(createCategoryInput: CreateCategoryInput): Promise<CategoryEntity> {
+    const category = this.categoryRepository.create(createCategoryInput);
+    return this.categoryRepository.save(category);
+  }
+
+  async createWithId(createCategoryDto: CreateCategoryDto): Promise<CategoryEntity> {
     const { id, name } = createCategoryDto;
     let category = await this.categoryRepository.findOne({ where: { id } });
 

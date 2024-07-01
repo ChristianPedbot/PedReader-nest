@@ -1,29 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
+import { useQuery } from '@apollo/client';
+import { GET_AUTHOR } from '../../data/mutations/getAuthor';
 
 function AuthorName({ authorId }) {
-  const [author, setAuthor] = useState(null);
+  const { loading, error, data } = useQuery(GET_AUTHOR, {
+    variables: { id: authorId },
+  });
 
-  useEffect(() => {
-    const fetchAuthor = async () => {
-      try {
-        console.log(authorId, 'id author autname')
-        const response = await axios.get(`http://localhost:3000/authors/${authorId}`);
-        console.log(response.data);
-        setAuthor(response.data);
-      } catch (error) {
-        console.log('Error fetching author:', error);
-      }
-    };
+  if (loading) return <span>Loading author...</span>;
+  if (error) return <span>Error loading author</span>;
 
-    fetchAuthor();
-  }, [authorId]);
-  if (!author) {
-    return <span>Loading author...</span>;
-  }
-
-  return <span>{author.name}</span>;
-
+  return <span>{data.author.name}</span>;
 }
 
 export default AuthorName;

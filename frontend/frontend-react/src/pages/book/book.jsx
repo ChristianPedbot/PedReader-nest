@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../../ui/styles/book/book.css';
 import AuthorName from './AutName';
 import { Link } from 'react-router-dom';
-import axiosInstance from '../../data/axios/axios';
+import { useMutation } from '@apollo/client';
+import { DELETE_BOOK } from '../../data/mutations/deleteBook';
 import EditButton from '../../ui/components/buttons/edit';
 import RentButton from '../../ui/components/buttons/rent';
 import { getUserInfoFromServer } from '../../data/utils/localStorage';
@@ -14,8 +15,9 @@ import { toast } from 'react-toastify';
 function Book({ book }) {
   const [userId, setUserId] = useState(null);
   const [userIsAdmin, setUserIsAdmin] = useState(null);
+  const [deleteBook] = useMutation(DELETE_BOOK);
 
-  useEffect(() => { 
+  useEffect(() => {
     const fetchUserInfo = async () => {
       const userInfo = await getUserInfoFromServer();
       setUserId(userInfo.userId);
@@ -27,10 +29,10 @@ function Book({ book }) {
 
   const handleDeleteBook = async (id) => {
     try {
-      await axiosInstance.delete(`/books/${id}`);
+      await deleteBook({ variables: { id } });
       toast.success('Book deleted successfully!');
       setTimeout(() => {
-        window.location.href = `/books`;
+        window.location.href = '/books';
       }, 2000);
     } catch (error) {
       toast.error('Error deleting book!');

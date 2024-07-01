@@ -10,7 +10,7 @@ export class LocationEntity {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   location_date: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp', nullable: true })
   return_date: Date;
 
   @ManyToOne(() => BookEntity, { nullable: true })

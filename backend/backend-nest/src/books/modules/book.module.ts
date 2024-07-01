@@ -7,12 +7,12 @@ import { AuthorEntity } from '../../authors/entities/author.entity';
 import { CategoryEntity } from '../../categories/entities/category.entity';
 import { CloudinaryModule } from '../../cloudinary/cloudinary.module';
 import { CloudinaryService } from '../../cloudinary/cloudinary.service';
-
+import { BookResolver } from '../../graphql/books/resolvers/book.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([BookEntity, AuthorEntity, CategoryEntity,]), CloudinaryModule],
   controllers: [BooksController],
-  providers: [BooksService, CloudinaryService],
+  providers: [BooksService, CloudinaryService, BookResolver],
 })
 export class BooksModule { }
 

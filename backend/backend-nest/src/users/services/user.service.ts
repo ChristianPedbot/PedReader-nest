@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { UserEntity } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from '../DTO/create-user.dto';
-import { UpdateUserDto } from '../DTO/update-user.dto';
+import { CreateUserInput } from '../../graphql/users/inputs/create-user.input';
+import { UpdateUserInput } from '../../graphql/users/inputs/update-user.input';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -25,15 +25,19 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const userToCreate = { ...createUserDto, password: hashedPassword };
+  async create(createUserInput: CreateUserInput): Promise<UserEntity> {
+    const hashedPassword = await bcrypt.hash(createUserInput.password, 10);
+    const userToCreate = { ...createUserInput, password: hashedPassword };
 
     const user = this.usersRepository.create(userToCreate);
     return this.usersRepository.save(user);
   }
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
-    await this.usersRepository.update(id, updateUserDto);
+
+  async update(id: number, updateUserInput: UpdateUserInput): Promise<UserEntity> {
+    if (updateUserInput.password) {
+      updateUserInput.password = await bcrypt.hash(updateUserInput.password, 10);
+    }
+    await this.usersRepository.update(id, updateUserInput);
     return this.findOne(id);
   }
 

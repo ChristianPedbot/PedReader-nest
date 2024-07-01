@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import '../../ui/styles/book/editBook.css';
 import UpdateButton from '../../ui/components/buttons/update';
 import { toast } from 'react-toastify';
+import { GET_CATEGORIES } from '../../data/mutations/getCategories';
+import { GET_AUTHORS } from '../../data/mutations/getAuthors';
+import { GET_BOOK_DETAILS } from '../../data/mutations/getBookDetails';
+import { useQuery, useMutation } from '@apollo/client';
+import { UPDATE_BOOK } from '../../data/mutations/updateBook'; // Importe a mutação de atualização
 
 function EditBooks({ book }) {
   const [formData, setFormData] = useState({
@@ -14,39 +18,35 @@ function EditBooks({ book }) {
     img: null,
   });
 
-  const [authors, setAuthors] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const { loading: categoriesLoading, error: categoriesError, data: categoriesData } = useQuery(GET_CATEGORIES);
+  const { loading: authorsLoading, error: authorsError, data: authorsData } = useQuery(GET_AUTHORS);
 
   useEffect(() => {
     if (book) {
-      const { title, description, availability, categorie, author, img } = book;
+      const { title, description, availability, category, author, img } = book;
       setFormData({
         title,
         description,
         availability: availability.toString(),
-        categorie: categorie.id.toString(),
+        categorie: category.id.toString(),
         author: author.id.toString(),
         img,
       });
     }
   }, [book]);
 
-  useEffect(() => {
-    const fetchAuthorsAndCategories = async () => {
-      try {
-        const [authorsResponse, categoriesResponse] = await Promise.all([
-          axios.get('http://localhost:3000/authors'),
-          axios.get('http://localhost:3000/categories'),
-        ]);
-        setAuthors(authorsResponse.data);
-        setCategories(categoriesResponse.data);
-      } catch (error) {
-        toast.error('Erro ao buscar autores e categorias');
-      }
-    };
-
-    fetchAuthorsAndCategories();
-  }, []);
+  const [updateBookMutation] = useMutation(UPDATE_BOOK, {
+    onError: (error) => {
+      toast.error(`Erro ao tentar editar o livro: ${error.message}`);
+    },
+    onCompleted: () => {
+      toast.success('Livro editado com sucesso!');
+      setTimeout(() => {
+        window.location.href = `/books/${book.id}`;
+      }, 2500);
+    },
+    refetchQueries: [{ query: GET_BOOK_DETAILS, variables: { id: book.id } }],
+  });
 
   const handleChange = (e) => {
     if (e.target.name === 'img') {
@@ -65,27 +65,22 @@ function EditBooks({ book }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('title', formData.title);
-    formDataToSend.append('description', formData.description);
-    formDataToSend.append('availability', formData.availability);
-    formDataToSend.append('categorie_id', formData.categorie);
-    formDataToSend.append('author_id', formData.author);
-
-    if (formData.img) {
-      formDataToSend.append('img', formData.img);
-    }
+    const formDataToSend = {
+      variables: {
+        id: book.id,
+        updateBookInput: {
+          title: formData.title,
+          description: formData.description,
+          availability: parseInt(formData.availability), // Garanta que a disponibilidade é um número
+          category_id: parseInt(formData.categorie), // Garanta que o id da categoria é um número
+          author_id: parseInt(formData.author), // Garanta que o id do autor é um número
+          img: formData.img,
+        },
+      },
+    };
 
     try {
-      const response = await axios.put(`http://localhost:3000/books/${book.id}`, formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      toast.success('Livro editado com sucesso!');
-      setTimeout(() => {
-        window.location.href = `/books/${book.id}`;
-      }, 2500);
+      await updateBookMutation(formDataToSend);
     } catch (error) {
       toast.error('Erro ao tentar editar o livro.');
     }
@@ -115,7 +110,7 @@ function EditBooks({ book }) {
             <div className='mb-3'>
               <label className='form-label' htmlFor="categorie">Gênero:</label>
               <select className='form-control' id="categorie" name="categorie" value={formData.categorie} onChange={handleChange}>
-                {categories.map(category => (
+                {categoriesData && categoriesData.categories.map(category => (
                   <option key={category.id} value={category.id}>{category.name}</option>
                 ))}
               </select>
@@ -123,7 +118,7 @@ function EditBooks({ book }) {
             <div className='mb-3'>
               <label className='form-label' htmlFor="author">Autor:</label>
               <select className='form-control' id="author" name="author" value={formData.author} onChange={handleChange}>
-                {authors.map(author => (
+                {authorsData && authorsData.authors.map(author => (
                   <option key={author.id} value={author.id}>{author.name}</option>
                 ))}
               </select>

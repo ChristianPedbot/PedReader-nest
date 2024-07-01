@@ -5,12 +5,13 @@ import { AuthorsController } from '../controllers/author.controller';
 import { AuthorEntity } from '../entities/author.entity';
 import { CloudinaryModule } from '../../cloudinary/cloudinary.module';
 import { CloudinaryService } from '../../cloudinary/cloudinary.service';
+import { AuhtorResolver } from '../../graphql/authors/resolvers/author.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([AuthorEntity]),
     CloudinaryModule,
   ],
-  providers: [AuthorsService, CloudinaryService],
+  providers: [AuthorsService, CloudinaryService , AuhtorResolver],
   controllers: [AuthorsController],
 })
 export class AuthorsModule { }

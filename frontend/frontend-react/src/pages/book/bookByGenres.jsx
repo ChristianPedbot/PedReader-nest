@@ -1,38 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useQuery } from '@apollo/client';
 import Navbar from '../../ui/components/Navbar.jsx';
 import Footer from '../../ui/components/Footer.jsx';
-import BooksByGenress from './BookByGenre.jsx';
+import BooksByGenres from './BookByGenre.jsx';
 import Pagination from '../../ui/components/Pagination.jsx';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { GET_BOOKS_BY_CATEGORY } from '../../data/mutations/getBooksByCategory.js';
+
 function ShowBookByGenre() {
-  const [books, setBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const { categoryId } = useParams();
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      if (categoryId && !isNaN(categoryId)) {
-        try {
-          const response = await axios.get(`http://localhost:3000/books/category/${categoryId}?page=${currentPage}`);
-          setBooks(response.data);
-        } catch (error) {
-          toast.error(`Error when searching for books: ${error}`);
-        }
-      } else {
-        toast.error('Invalid category ID');
-      }
-    };
+  const { loading, error, data } = useQuery(GET_BOOKS_BY_CATEGORY, {
+    variables: { categoryId: Number(categoryId), page: currentPage },
+  });
 
-    fetchBooks();
-  }, [currentPage, categoryId]);
+  useEffect(() => {
+    if (error) {
+      toast.error(`Error when searching for books: ${error.message}`);
+    }
+  }, [error]);
+
+  const books = data ? data.booksByCategory : [];
 
   return (
     <div>
       <Navbar />
-      <BooksByGenress books={books} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <BooksByGenres books={books} currentPage={currentPage} setCurrentPage={setCurrentPage} />
       <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} />
       <Footer />
     </div>

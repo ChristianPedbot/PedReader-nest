@@ -11,7 +11,7 @@ function AddAuthor() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataToSend = new FormData(e.target);
-
+    
     try {
       toast.info("Adding author...");
       console.log(formDataToSend)

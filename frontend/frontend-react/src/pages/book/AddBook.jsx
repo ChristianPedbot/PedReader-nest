@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import '../../ui/styles/book/addBook.css';
+import { useMutation } from '@apollo/client';
 import { toast } from 'react-toastify';
+import '../../ui/styles/book/addBook.css';
 import { AddBookButton } from '../../ui/components/buttons/add';
+import { CREATE_BOOK } from '../../data/mutations/createBook';
+import { uploadImageToBackend } from '../../data/services/cloudinaryService';
 
 function AddBook({ authors }) {
   const [formData, setFormData] = useState({
@@ -14,6 +16,8 @@ function AddBook({ authors }) {
     author: authors.length > 0 ? authors[0].id : '',
     img: null
   });
+
+  const [createBook, { loading }] = useMutation(CREATE_BOOK);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,21 +42,35 @@ function AddBook({ authors }) {
       return;
     }
 
-    const formDataToSend = new FormData();
-    for (const key in formData) {
-      formDataToSend.append(key, formData[key]);
+    if (!formData.img) {
+      toast.error('Please upload an image.');
+      return;
     }
 
     try {
-      toast.info("Adding book...");
-      const response = await axios.post('http://localhost:3000/books', formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        timeout: 60000
-      });
+      toast.info("Uploading image...");
+      
+      // Upload image to backend
+      const imgURL = await uploadImageToBackend(formData.img);
 
-      if (response.status === 201) {
+      const formDataToSend = {
+        variables: {
+          createBookInput: {
+            title: formData.title,
+            description: formData.description,
+            img: imgURL,
+            availability: parseInt(formData.availability),
+            date: formData.date,
+            author_id: parseInt(formData.author),
+            category_id: parseInt(formData.categorie)
+          }
+        }
+      };
+
+      toast.info("Adding book...");
+      const { data } = await createBook(formDataToSend);
+
+      if (data.createBook) {
         toast.success("Book added successfully!");
         setTimeout(() => {
           window.location.href = '/books';
@@ -61,11 +79,10 @@ function AddBook({ authors }) {
         toast.error('Failed to add book. Please try again.');
       }
     } catch (error) {
-      console.error('Error response:', error.response);
+      console.error('Error response:', error);
       toast.error('Error adding book. Please try again.');
     }
   };
-
 
   return (
     <div className="row text-white">

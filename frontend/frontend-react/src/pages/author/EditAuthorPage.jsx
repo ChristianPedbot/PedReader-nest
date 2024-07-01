@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import '../../ui/styles/author/editAuthor.css'
+import '../../ui/styles/author/editAuthor.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import UpdateButton from '../../ui/components/buttons/update';
 import BackButton from '../../ui/components/buttons/back';
 import { toast } from 'react-toastify';
-
+import { useQuery } from '@apollo/client';
+import { GET_AUTHOR } from '../../data/mutations/getAuthor';
 function EditAuthor() {
   const { id } = useParams();
   const [author, setAuthor] = useState({
@@ -15,18 +16,20 @@ function EditAuthor() {
   });
   const [selectedFile, setSelectedFile] = useState(null);
 
-  useEffect(() => {
-    const fetchAuthor = async () => {
-      try {
-        const authorResponse = await axios.get(`http://localhost:3000/authors/${id}`);
-        setAuthor(authorResponse.data);
-      } catch (error) {
-        console.error('Error fetching author:', error);
-      }
-    };
+  const { loading, error, data } = useQuery(GET_AUTHOR, {
+    variables: { id: parseInt(id) }, 
+  });
 
-    fetchAuthor();
-  }, [id]);
+  useEffect(() => {
+    if (data && data.author) {
+      const { name, biography, img } = data.author;
+      setAuthor({
+        name,
+        biography,
+        img,
+      });
+    }
+  }, [data]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -70,6 +73,9 @@ function EditAuthor() {
       }
     }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div className="container-edit">

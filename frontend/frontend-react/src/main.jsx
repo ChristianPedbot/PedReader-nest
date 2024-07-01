@@ -1,6 +1,6 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import Home from './pages/home/HomePage.jsx';
 import ShowBook from './pages/book/bookPage.jsx';
 import AddingBook from './pages/book/addBookPage.jsx';
@@ -14,18 +14,25 @@ import AppBookByGenre from './pages/book/bookByGenres.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const client = new ApolloClient({
+  uri: 'http://localhost:3000/graphql', 
+  cache: new InMemoryCache(),
+});
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <IndexApp />
-    <Home />
-    <AppBookByGenre />
-    <AppBookPage />
-    <ShowBook />
-    <AuthorApp />
-    <ShowAuthor />
-    <AddingBook />
-    <ShowEditBook />
-    <ShowUser />
-    <ToastContainer />
+    <ApolloProvider client={client}>
+      <IndexApp />
+      <Home />
+      <AppBookByGenre />
+      <AppBookPage />
+      <ShowBook />
+      <AuthorApp />
+      <ShowAuthor />
+      <AddingBook />
+      <ShowEditBook />
+      <ShowUser />
+      <ToastContainer />
+    </ApolloProvider>
   </React.StrictMode>
-)
+);

@@ -1,31 +1,35 @@
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
+import { useQuery, gql } from '@apollo/client';
+import { useParams , BrowserRouter,Route, Routes } from 'react-router-dom';
 import Navbar from '../../ui/components/Navbar.jsx';
 import Footer from '../../ui/components/Footer.jsx';
 import Author from './Author.jsx';
 import ProtectedRoute from '../../data/protection/ProtectedRoute.jsx';
 
+const GET_AUTHOR = gql`
+  query GetAuthor($id: Int!) {
+    author(id: $id) {
+      id
+      name
+      biography
+      img
+    }
+  }
+`;
+
 function ShowAuthorPage() {
   const { id } = useParams();
-  const [author, setAuthor] = useState(null);
+  const { loading, error, data } = useQuery(GET_AUTHOR, {
+    variables: { id: parseInt(id) }
+  });
 
-  useEffect(() => {
-    const fetchAuthor = async () => {
-      try {
-        const authorResponse = await axios.get(`http://localhost:3000/authors/${id}`);
-        setAuthor(authorResponse.data);
-      } catch (error) {
-      }
-    };
-
-    fetchAuthor();
-  }, [id]);
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div>
       <Navbar />
-      <Author author={author} />
+      <Author author={data.author} />
       <Footer />
     </div>
   );

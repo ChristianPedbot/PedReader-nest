@@ -11,7 +11,9 @@
     "start": "npm i && npm run dev"
   },
   "dependencies": {
+    "@apollo/client": "^3.10.8",
     "axios": "^1.7.2",
+    "graphql": "^16.9.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.1",
